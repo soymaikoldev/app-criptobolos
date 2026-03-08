@@ -9,10 +9,10 @@ export function Button({ className, variant = "default", ...props }: Props) {
   return (
     <button
       className={cn(
-        "inline-flex items-center justify-center rounded-md px-3 py-2 text-sm font-medium transition disabled:opacity-50",
-        variant === "default" && "bg-blue-600 text-white hover:bg-blue-700",
-        variant === "outline" && "border border-slate-300 bg-white hover:bg-slate-50",
-        variant === "danger" && "bg-red-600 text-white hover:bg-red-700",
+        "inline-flex items-center justify-center rounded-lg px-4 py-2.5 text-sm font-medium transition-colors active:scale-95 disabled:opacity-50",
+        variant === "default" && "bg-indigo-600 text-white hover:bg-indigo-700 active:bg-indigo-800",
+        variant === "outline" && "border border-slate-700 text-slate-200 hover:bg-slate-800 active:bg-slate-700",
+        variant === "danger" && "bg-rose-600 text-white hover:bg-rose-700 active:bg-rose-800",
         className,
       )}
       {...props}

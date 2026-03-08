@@ -1,0 +1,19 @@
+{
+  "name": "Crypto Life Tracker",
+  "short_name": "CryptoTracker",
+  "description": "Controla tus finanzas reales en cripto y bolívares",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#020617",
+  "theme_color": "#6366f1",
+  "lang": "es",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

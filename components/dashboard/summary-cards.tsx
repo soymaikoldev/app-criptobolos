@@ -1,33 +1,128 @@
 import { Card } from "@/components/ui/card";
+import { AccountBalance, CategoryBudget } from "@/types";
 
-const money = (n: number) => `$${n.toFixed(2)}`;
+interface BudgetWithProgress extends CategoryBudget {
+  spent: number;
+  pct: number;
+}
 
 export function SummaryCards({
-  gasto,
-  ingreso,
-  promedio,
-  ahorro,
+  totalUsdt,
+  totalBcv,
+  totalIngreso,
+  promedioDiario,
+  ahorroVsBCV,
+  totalCambiado,
+  balances,
+  showBalances,
+  budgetProgress = [],
 }: {
-  gasto: number;
-  ingreso: number;
-  promedio: number;
-  ahorro: number;
+  totalUsdt: number;
+  totalBcv: number;
+  totalIngreso: number;
+  promedioDiario: number;
+  ahorroVsBCV: number;
+  totalCambiado: number;
+  balances?: AccountBalance[];
+  showBalances?: boolean;
+  budgetProgress?: BudgetWithProgress[];
 }) {
-  const data = [
-    { label: "Gasto del mes", value: money(gasto) },
-    { label: "Ingresos del mes", value: money(ingreso) },
-    { label: "Promedio diario", value: money(promedio) },
-    { label: "Ahorro vs BCV", value: money(ahorro) },
-  ];
-
   return (
-    <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-      {data.map((item) => (
-        <Card key={item.label}>
-          <p className="text-xs text-slate-500">{item.label}</p>
-          <p className="mt-2 text-2xl font-semibold">{item.value}</p>
+    <div className="space-y-3">
+      {/* Métrica principal: USDT gastados */}
+      <Card className="bg-gradient-to-br from-indigo-950/60 to-slate-900 border-indigo-800/40">
+        <p className="text-xs text-indigo-300 font-medium uppercase tracking-wide mb-1">
+          USDT gastados este mes
+        </p>
+        <p className="text-4xl font-bold text-white">
+          {totalUsdt.toFixed(2)}
+          <span className="text-lg text-indigo-300 ml-2">USDT</span>
+        </p>
+        <div className="mt-2 flex items-center gap-3 text-sm">
+          <span className="text-slate-400">
+            ≈ <span className="text-slate-200">${totalBcv.toFixed(2)}</span> a tasa BCV
+          </span>
+          {ahorroVsBCV > 0 && (
+            <span className="text-emerald-400 font-medium">
+              Ahorraste ${ahorroVsBCV.toFixed(2)}
+            </span>
+          )}
+        </div>
+      </Card>
+
+      {/* 3 tarjetas secundarias */}
+      <div className="grid grid-cols-3 gap-2">
+        <Card className="py-3">
+          <p className="text-xs text-slate-500">Promedio/día</p>
+          <p className="text-base font-bold text-blue-400 mt-0.5">{promedioDiario.toFixed(2)}</p>
+          <p className="text-xs text-slate-600">USDT</p>
         </Card>
-      ))}
-    </div>
-  );
+        <Card className="py-3">
+          <p className="text-xs text-slate-500">Ingresos</p>
+          <p className="text-base font-bold text-emerald-400 mt-0.5">{totalIngreso.toFixed(2)}</p>
+          <p className="text-xs text-slate-600">USDT</p>
+        </Card>
+        <Card className="py-3">
+          <p className="text-xs text-slate-500">Cambiado</p>
+          <p className="text-base font-bold text-purple-400 mt-0.5">{totalCambiado.toFixed(2)}</p>
+          <p className="text-xs text-slate-600">USDT→Bs</p>
+        </Card>
+      </div>
+
+      {/* Saldos por cuenta */}
+      {showBalances && balances && balances.length > 0 && (
+        <div>
+          <p className="text-xs text-slate-500 mb-2 px-1">Saldo estimado por cuenta</p>
+          <div className="flex gap-2 overflow-x-auto pb-1 snap-x">
+            {balances.map((b) => (
+              <div
+                key={b.account.id}
+                className="flex-none snap-start rounded-xl border border-slate-800 bg-slate-900 p-3 min-w-[140px]"
+              >
+                <p className="text-xs text-slate-500">{b.account.type}</p>
+                <p className="text-xs text-slate-300 font-medium truncate mt-0.5">{b.account.name}</p>
+                <p className="text-base font-bold text-white mt-1">
+                  {b.balance.toLocaleString("es-VE", { maximumFractionDigits: 2 })}
+                  <span className="text-xs text-slate-400 ml-1">{b.currency}</span>
+                </p>
+                {b.currency !== "Bs" && (
+                  <p className="text-xs text-slate-500">≈ ${b.balanceUsd.toFixed(2)}</p>
+                )}
+                {/* Extra balances (SOL, SKR, etc.) */}
+                {(b.account.extraBalances ?? []).map((extra) => (
+                  <p key={extra.symbol} className="text-xs text-slate-500 mt-0.5">
+                    {extra.symbol}: {extra.amount.toLocaleString("es-VE", { maximumFractionDigits: 4 })}
+                  </p>
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Metas del mes */}
+      {budgetProgress.length > 0 && (
+        <div>
+          <p className="text-xs text-slate-500 mb-2 px-1">Metas del mes</p>
+          <Card className="space-y-3">
+            {budgetProgress.map((b) => (
+              <div key={b.id}>
+                <div className="flex justify-between text-xs mb-1">
+                  <span className="text-slate-300">{b.category}</span>
+                  <span className={b.pct >= 100 ? "text-rose-400" : b.pct >= 80 ? "text-amber-400" : "text-slate-400"}>
+                    {b.spent.toFixed(2)} / {b.limitUsdt} USDT
+                  </span>
+                </div>
+                <div className="h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                  <div
+                    className={`h-full rounded-full transition-all ${b.pct >= 100 ? "bg-rose-500" : b.pct >= 80 ? "bg-amber-500" : "bg-indigo-500"}`}
+                    style={{ width: `${b.pct}%` }}
+                  />
+                </div>
+              </div>
+            ))}
+          </Card>
+        </div>
+      )}
+    </div>  );
 }

@@ -3,9 +3,32 @@
 @tailwind utilities;
 
 body {
-  @apply bg-slate-50 text-slate-900 antialiased;
+  @apply bg-slate-950 text-slate-100 antialiased;
+  -webkit-text-size-adjust: 100%;
 }
 
-* {
-  @apply border-border;
+html {
+  color-scheme: dark;
 }
+
+input[type="date"],
+input[type="month"],
+input[type="number"],
+input[type="text"],
+textarea,
+select {
+  color-scheme: dark;
+}
+
+/* Safe area para teléfonos con notch / home indicator */
+.safe-pb {
+  padding-bottom: max(env(safe-area-inset-bottom), 0.5rem);
+}
+
+/* Scrollbar delgada */
+::-webkit-scrollbar { width: 3px; height: 3px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #334155; border-radius: 2px; }
+
+/* Tap highlight en móvil */
+* { -webkit-tap-highlight-color: transparent; }
