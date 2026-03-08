@@ -13,6 +13,9 @@ export function SummaryCards({
   promedioDiario,
   ahorroVsBCV,
   totalCambiado,
+  projection,
+  isCurrentMonth,
+  totalDaysInMonth,
   balances,
   showBalances,
   budgetProgress = [],
@@ -23,6 +26,9 @@ export function SummaryCards({
   promedioDiario: number;
   ahorroVsBCV: number;
   totalCambiado: number;
+  projection?: number;
+  isCurrentMonth?: boolean;
+  totalDaysInMonth?: number;
   balances?: AccountBalance[];
   showBalances?: boolean;
   budgetProgress?: BudgetWithProgress[];
@@ -48,6 +54,14 @@ export function SummaryCards({
             </span>
           )}
         </div>
+        {isCurrentMonth && projection !== undefined && totalDaysInMonth !== undefined && (
+          <div className="mt-3 pt-3 border-t border-indigo-800/30 flex items-center justify-between text-sm">
+            <span className="text-slate-500">Proyección al día {totalDaysInMonth}</span>
+            <span className={`font-semibold ${projection > totalUsdt * 1.2 ? "text-rose-400" : "text-indigo-300"}`}>
+              ~{projection.toFixed(2)} USDT
+            </span>
+          </div>
+        )}
       </Card>
 
       {/* 3 tarjetas secundarias */}

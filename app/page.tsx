@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { SummaryCards } from "@/components/dashboard/summary-cards";
 import { ChartsPanel } from "@/components/dashboard/charts-panel";
+import { WeeklySummary } from "@/components/dashboard/weekly-summary";
 import { MovementForm } from "@/components/forms/movement-form";
 import { AccountForm } from "@/components/forms/account-form";
 import { RatesForm } from "@/components/forms/rates-form";
@@ -172,6 +173,9 @@ export default function HomePage() {
           promedioDiario={summary.promedioDiario}
           ahorroVsBCV={summary.ahorroVsBCV}
           totalCambiado={summary.totalCambiado}
+          projection={summary.projection}
+          isCurrentMonth={summary.isCurrentMonth}
+          totalDaysInMonth={summary.totalDaysInMonth}
           balances={accountBalances}
           showBalances={tab === "inicio"}
           budgetProgress={tab === "inicio" ? budgetProgressData : []}
@@ -183,7 +187,10 @@ export default function HomePage() {
         )}
 
         {tab === "inicio" && !isFirstTime && (
-          <ChartsPanel transactions={filteredTransactions} accounts={accounts} />
+          <>
+            <WeeklySummary transactions={transactions} />
+            <ChartsPanel transactions={filteredTransactions} accounts={accounts} />
+          </>
         )}
 
         {tab === "historial" && (
@@ -216,6 +223,7 @@ export default function HomePage() {
               balances={accountBalances}
               onEdit={setEditingAccount}
               onDelete={(id) => setAccounts((prev) => prev.filter((acc) => acc.id !== id))}
+              onReorder={setAccounts}
             />
           </div>
         )}

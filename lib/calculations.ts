@@ -28,13 +28,28 @@ export function monthlySummary(transactions: Transaction[], monthKey: string) {
   const ahorroVsBCV = totalBcv - totalUsdt;
   const totalCambiado = cambios.reduce((acc, tx) => acc + tx.amount, 0);
 
-  const days =
-    new Date(`${monthKey}-01`).getMonth() === new Date().getMonth() &&
-    new Date(`${monthKey}-01`).getFullYear() === new Date().getFullYear()
-      ? new Date().getDate()
-      : new Date(Number(monthKey.slice(0, 4)), Number(monthKey.slice(5)), 0).getDate();
+  const today = new Date();
+  const monthDate = new Date(`${monthKey}-01`);
+  const isCurrentMonth =
+    monthDate.getMonth() === today.getMonth() &&
+    monthDate.getFullYear() === today.getFullYear();
+  const totalDaysInMonth = new Date(Number(monthKey.slice(0, 4)), Number(monthKey.slice(5)), 0).getDate();
+  const days = isCurrentMonth ? today.getDate() : totalDaysInMonth;
+  const projection = isCurrentMonth && days > 0
+    ? (totalUsdt / days) * totalDaysInMonth
+    : totalUsdt;
 
-  return { totalUsdt, totalBcv, totalIngreso, promedioDiario: days > 0 ? totalUsdt / days : 0, ahorroVsBCV, totalCambiado };
+  return {
+    totalUsdt,
+    totalBcv,
+    totalIngreso,
+    promedioDiario: days > 0 ? totalUsdt / days : 0,
+    ahorroVsBCV,
+    totalCambiado,
+    projection,
+    isCurrentMonth,
+    totalDaysInMonth,
+  };
 }
 
 export function monthLabel(date: string): string {
